@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<div id="map" class="full-screen"></div>
+
+<button class="button-3" role="button" id="draw_btn" onclick="drawClicked()">Нарисовать</button>
+<button class="button-3" role="button" id="save_btn" onclick="saveClicked()">Сохранить</button>
+
+<div id="warehouse_container" class="modal-background">
+    <div class="modal-content">
+        
+        <input type="text" id="org_name" name="name" placeholder="Наименование организации" style="margin-top: 40px;">
+        <input type="text" id="org_activity" name="activity" placeholder="Вид деятельности">
+        
+        <button id="send_btn" onclick="saveWarehouse('@Url.Action("Create", "Warehouse")')">Отправить</button>
+        
+        <button class="button-3" role="button" id="close_btn" onclick="closeClicked()">X</button>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+    
+    function saveClicked() {
+        $("#warehouse_container").css("visibility", "visible");
+    }
+    
+    function closeClicked() {
+        $("#warehouse_container").css("visibility", "collapse");
+    }
+    
+    </script>
+}
