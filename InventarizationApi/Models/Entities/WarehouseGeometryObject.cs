@@ -22,4 +22,11 @@ public class WarehouseGeometryObject
         GeoObject = geoObject;
         WarehouseId = warehouseId;
     }
+
+    public WarehouseGeometryObject(long id, Geometry geoObject, long warehouseId)
+    {
+        Id = id;
+        GeoObject = geoObject;
+        WarehouseId = warehouseId;
+    }
 }

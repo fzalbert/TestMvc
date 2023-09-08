@@ -1,18 +1,21 @@
 using NetTopologySuite.Geometries;
 
-namespace InventarizationApi.Controllers;
+namespace inventarization_api.Controllers;
 
-public class WarehouseModel
+public class WarehouseCreateRequest
 {
-    public WarehouseModel(long id, string name, string activityType, List<Geometry> geoObjects)
+    
+    public WarehouseCreateRequest(List<Geometry> geoObjects)
     {
-        Id = id;
+        GeoObjects = geoObjects;
+    }
+
+    public WarehouseCreateRequest(string name, string activityType, List<Geometry> geoObjects)
+    {
         Name = name;
         ActivityType = activityType;
         GeoObjects = geoObjects;
     }
-
-    public long Id { get; set; }
 
     /**
      * наименование

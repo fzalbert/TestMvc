@@ -3,6 +3,8 @@ using InventarizationApi.Models.Repository.Warehouse;
 using InventarizationApi.Models.Repository.WarehouseGeometry;
 using InventarizationApi.Models.Service;
 using InventarizationApi.Models.Service.Db;
+using InventarizationApi.Utils;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,7 @@ builder.Services.AddSingleton<IConnectorCreator, PostgresConnectorCreator>()
     .AddScoped<IWarehouseRepository, WarehouseRepository>()
     .AddScoped<IWarehouseGeometryObjectsRepository, WarehouseGeometryObjectRepository>()
     .AddScoped<WarehouseService>()
+    .AddSingleton<GeometryToJsonSerializer>()
     .Configure<DataSource>(builder.Configuration.GetSection("DataSource"))
     .AddControllersWithViews()
     .AddJsonOptions(
@@ -20,6 +23,7 @@ builder.Services.AddSingleton<IConnectorCreator, PostgresConnectorCreator>()
                 new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
         }
     );
+
 
 var app = builder
     .Build();

@@ -10,6 +10,9 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 const editableLayers = new L.FeatureGroup();
 const selectedLayers = new L.FeatureGroup();
+
+var selectedObjects = null;
+
 map.addLayer(editableLayers);
 map.addLayer(selectedLayers);
 
@@ -50,9 +53,7 @@ var drawControl = new L.Control.Draw(options);
 
 map.on('draw:created', function (e) {
     const type = e.layerType, layer = e.layer;
-
-    if (type === 'marker') {
-    }
+    
     editableLayers.addLayer(layer);
 });
 
@@ -61,17 +62,16 @@ function saveWarehouse(url) {
     editableLayers.eachLayer(
         function (layer) {
             const geojson = layer.toGeoJSON();
-            layers.push(geojson.geometry);
+            layers.push(geojson);
         }
     )
 
     const name = $('#org_name').val();
     const activity = $('#org_activity').val();
-
+    
     const data = JSON.stringify({
-        "Name": name,
-        "ActivityType": activity,
-        "GeoObjects": layers
+        "Type": "FeatureCollection",
+        "Features": layers
     });
 
     $.ajax({
@@ -94,15 +94,65 @@ function saveWarehouse(url) {
 }
 
 function mapClicked(e) {
+    if(selectedObjects != null) {
+        map.removeLayer(selectedObjects);
+        selectedObjects = null;
+    }
+    
     selectedLayers.clearLayers();
     const location = e.latlng;
-    const selected = L.tileLayer.wms(`http://localhost:8081/geoserver/inventarization/wms?viewparams=lat:${location.lng};lon:${location.lat}`, {
-        layers: 'inventarization:warehouse_object_inter',
-        format: 'image/png',
-        transparent: true
+    
+    $.ajax({
+        type: "GET",
+        url: `http://localhost:5148/api/warehouse?lat=${location.lng}&lon=${location.lat}`,
+        contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+            showSelected(result, e.latlng)
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Status: " + textStatus); alert("Error: " + errorThrown);
+        }
+    })
+    
+}
+
+function showSelected(items, location){
+    
+    var geoObjects = [];
+    var warehouseInfo = [];
+    items.forEach((element) => {
+        geoObjects = geoObjects.concat(element.geoObjects)
+        warehouseInfo.push(
+            {
+                name: element.name,
+                type: element.activityType
+            }
+        );
     });
-    selectedLayers.addLayer(selected);
-    // selectedLayers.bringToFront();
+    
+    var myStyle = {
+        "color": "#ff7800",
+        "weight": 5,
+        "opacity": 0.65,
+        "z-index": 2000
+    };
+    
+    selectedObjects = L.geoJSON(geoObjects, {style: myStyle})
+        .addTo(map);
+    
+    var popupView = "";
+    warehouseInfo.forEach((element) => {
+        var name = element.name
+        var type = element.type;
+        popupView += '<p>' + 'Name: ' + name + '\n';
+        popupView += 'Type: ' + type + '</p>';
+        popupView += '<p></p>';
+    });
+    selectedObjects.bindPopup(popupView).openPopup();
+        
+    
+    // selectedLayers.addLayer(selected);
 }
 
 

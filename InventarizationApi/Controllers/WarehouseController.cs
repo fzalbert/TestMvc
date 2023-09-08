@@ -1,4 +1,3 @@
-using System.Globalization;
 using inventarization_api.Controllers;
 using InventarizationApi.Models.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -16,9 +15,20 @@ public class WarehouseController : Controller
     }
 
     [HttpPost("")]
-    public async Task<ActionResult> Create([FromBody] WarehouseModel request)
+    public async Task<ActionResult> Create([FromBody] WarehouseCreateRequest request)
     {
         await _warehouseService.Create(request);
         return NoContent();
+    }
+
+    [HttpGet("")]
+    public async Task<IActionResult> GetIntersecting([FromQuery] double? lat,[FromQuery] double? lon)
+    {
+        if (lat == null || lon == null)
+            return StatusCode(400);
+
+        var result = await _warehouseService.GetIntersects(lat.Value, lon.Value);
+        
+        return Ok(result);
     }
 }

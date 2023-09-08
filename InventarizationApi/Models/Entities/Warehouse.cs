@@ -10,6 +10,13 @@ public class Warehouse
         ActivityType = activityType;
     }
 
+    public Warehouse(long id, string name, string activityType)
+    {
+        Id = id;
+        Name = name;
+        ActivityType = activityType;
+    }
+
     public long Id { get; set; }
 
     /**
